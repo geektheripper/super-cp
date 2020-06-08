@@ -1,0 +1,60 @@
+# sources
+.build: &src.build
+  pattern: dist/**/*
+  strip: dist
+
+.testUtils: &src.testUtils
+  pattern: build/web/**/*
+  strip: build
+
+# dists
+.myBucket: &dist.myBucket
+  type: "@oss"
+  path: /test/
+  bucket: my-bucket
+  region: $OSS_REGION
+  accessKeyId: $OSS_ACCESS_KEY_ID
+  accessKeySecret: $OSS_ACCESS_KEY_SECRET
+
+# rules
+# make fll files public read
+.publicRead: &rule.publicRead
+  pattern: "**/*"
+  acl: public-read
+
+# apply mime type for all files
+.applyMineType: &rule.applyMineType
+  pattern: "**/*"
+  autoMimeType: true
+
+# cache 1min for html files
+.cacheHtmlFilesInRootPath: &rule.cacheHtmlFilesInRootPath
+  pattern: "**/*.json"
+  headers:
+    "Cache-Control": public, max-age=60
+
+# no cache
+.noCache: &rule.noCache
+  pattern: "**/*"
+  headers:
+    "Cache-Control": public, max-age=60
+
+environments:
+  test:
+    - source: *src.build
+      dist: *dist.myBucket
+      rules:
+        - *rule.applyMineType
+        - *rule.cacheHtmlFilesInRootPath
+
+    - source: *src.testUtils
+      dist: *dist.myBucket
+      rules:
+        - *rule.noCache
+
+  prod:
+    - source: *src.build
+      dist: *dist.myBucket
+      rules:
+        - *rule.applyMineType
+        - *rule.cacheHtmlFilesInRootPath
