@@ -8,7 +8,7 @@
     "outDir": "lib",
     "rootDir": "src",
     "strict": true,
-    "types": ["node", "inquirer"],
+    "types": ["node"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "importHelpers": true
