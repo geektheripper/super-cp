@@ -27,14 +27,22 @@ super-cp 使用一个配置文件来设定传输规则，一般是项目目录�
 
 ```yaml
 source:
+  pattern:
+    glob: dist/**/*
+    options:
+      dot: true
+  strip: dist
+source2:
   pattern: dist/**/*
   strip: dist
 ```
 
 `source` 指定了要被传输的文件，它有以下参数
 
-- pattern(string): 用于匹配文件的 glob pattern，如 `dist/**/*`，语法可以参考 [minimatch - npm](https://www.npmjs.com/package/minimatch) 的介绍
-- strip(string): 剥除路径，在上面的例子中，假设匹配到一个文件：`dist/index.html`，实际传递给目标的，是 `index.html`
+- `pattern.glob`(string): 用于匹配文件的 glob pattern，如 `dist/**/*`，语法可以参考 [minimatch - npm](https://www.npmjs.com/package/minimatch) 的介绍
+- `pattern.options`(object): 传给 glob 的选项，参考 [Glob Options](https://www.npmjs.com/package/glob#options)，默认值为：`{ nodir: true }`
+- `pattern`(string): 当不需要设置 options 时，可在 `pattern` 上直接设置一个字符串作为 glob
+- `strip`(string): 剥除路径，在上面的例子中，假设匹配到一个文件：`dist/index.html`，实际传递给目标的，是 `index.html`
 
 ### dist
 
@@ -51,7 +59,10 @@ dist:
 
 ```yaml
 rules:
-  - pattern: "*/**"
+  - pattern:
+      glob: "*/**"
+      options:
+        noext: true
     autoContentType: true
   - pattern: "*.html"
     headers:
@@ -60,9 +71,11 @@ rules:
 
 `rules` 是对文件的简单“处理”，每条规则有以下参数
 
-- pattern(string): 用于筛选文件的 glob pattern，基于 strip 之后的路径进行匹配
-- exclude(boolean): exclude 是一个特殊规则，当它为 `true` 时，匹配到的文件不传输
-- pattern, exclude 之外的参数会传递给对应的目标插件
+- `pattern.glob`(string): 用于筛选文件的 glob pattern，基于 strip 之后的路径进行匹配
+- `pattern.options`(object): 传给 minimatch 的选项，参考 [Minimatch Options](https://www.npmjs.com/package/minimatch#options)，默认值为：`{ dot: true }`
+- `pattern`(string): 当不需要设置 options 时，可在 `pattern` 上直接设置一个字符串作为 glob
+- `exclude`(boolean): exclude 是一个特殊规则，当它为 `true` 时，匹配到的文件不传输
+- 其他参数将被传递给对应的目标插件
 
 ### environments
 

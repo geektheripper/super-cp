@@ -1,26 +1,27 @@
 import glob from "glob";
 import escapeStr from "escape-string-regexp";
 import File from "./file";
+import Parttern, { PartternOptions } from "./pattern";
 
 export interface SourceOptions {
-  pattern: string;
+  pattern: PartternOptions<glob.IOptions>;
   strip?: string;
 }
 
-type SourceListener = (file: File) => unknown;
-
 export default class Source {
-  pattern: string;
+  pattern: Parttern<glob.IOptions>;
   strip: string;
   private stripRegex: RegExp;
   constructor(opts: SourceOptions) {
-    this.pattern = opts.pattern;
-    this.strip = opts.strip || "";
+    const { pattern, strip } = opts;
+    this.pattern = new Parttern(pattern);
+    this.pattern.defaults({ nodir: true });
+    this.strip = strip || "";
     this.stripRegex = new RegExp("^" + escapeStr(this.strip));
   }
   listFiles(): Promise<File[]> {
     return new Promise((resolve, reject) => {
-      glob(this.pattern, { nodir: true }, (err, matchs) => {
+      glob(this.pattern.glob, this.pattern.options, (err, matchs) => {
         if (err) return reject(err);
         resolve(
           matchs.map(

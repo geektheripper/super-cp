@@ -1,43 +1,51 @@
 # sources
-.build: &src.build
-  pattern: dist/**/*
-  strip: dist
+.src:
+  .build: &src.build
+    pattern: dist/**/*
+    strip: dist
 
-.testUtils: &src.testUtils
-  pattern: build/web/**/*
-  strip: build
+  .testUtils: &src.testUtils
+    pattern:
+      glob: build/web/**/*
+      options:
+        dot: true
+    strip: build
 
-# dists
-.myBucket: &dist.myBucket
-  type: "@oss"
-  path: /test/
-  bucket: my-bucket
-  region: $OSS_REGION
-  accessKeyId: $OSS_ACCESS_KEY_ID
-  accessKeySecret: $OSS_ACCESS_KEY_SECRET
+.dists:
+  # dists
+  .myBucket: &dist.myBucket
+    type: "@oss"
+    path: /test/
+    bucket: my-bucket
+    region: $OSS_REGION
+    accessKeyId: $OSS_ACCESS_KEY_ID
+    accessKeySecret: $OSS_ACCESS_KEY_SECRET
 
 # rules
-# make fll files public read
-.publicRead: &rule.publicRead
-  pattern: "**/*"
-  acl: public-read
+.rule:
+  # make fll files public read
+  .publicRead: &rule.publicRead
+    glob: "*/**"
+    options:
+      noext: true
+    acl: public-read
 
-# apply mime type for all files
-.applyMineType: &rule.applyMineType
-  pattern: "**/*"
-  autoMimeType: true
+  # apply mime type for all files
+  .applyMineType: &rule.applyMineType
+    pattern: "**/*"
+    autoMimeType: true
 
-# cache 1min for html files
-.cacheHtmlFilesInRootPath: &rule.cacheHtmlFilesInRootPath
-  pattern: "**/*.json"
-  headers:
-    "Cache-Control": public, max-age=60
+  # cache 1min for html files
+  .cacheHtmlFilesInRootPath: &rule.cacheHtmlFilesInRootPath
+    pattern: "**/*.json"
+    headers:
+      "Cache-Control": public, max-age=60
 
-# no cache
-.noCache: &rule.noCache
-  pattern: "**/*"
-  headers:
-    "Cache-Control": public, max-age=60
+  # no cache
+  .noCache: &rule.noCache
+    pattern: "**/*"
+    headers:
+      "Cache-Control": public, max-age=60
 
 environments:
   test:
