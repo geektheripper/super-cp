@@ -75,8 +75,8 @@ Key:     ${key}
 ACL:     ${acl}
 Headers:
 ${Object.keys(headers)
-  .map((key) => `    ${key}: ${headers[key]}`)
-  .join("\n")}`);
+          .map((key) => `    ${key}: ${headers[key]}`)
+          .join("\n")}`);
       return;
     }
 
@@ -85,7 +85,7 @@ ${Object.keys(headers)
     try {
       const head = await this.client.head(key);
       remoteHeaders = head.res.headers as Record<string, string>;
-    } catch {}
+    } catch { }
 
     // object content changed
     // can't reset header for object via aliyun oss api

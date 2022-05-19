@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import program from "commander";
+import { program } from "commander";
 import fs from "fs";
 import yaml from "js-yaml";
 import Transfer, { TransferConfig } from "./transfer";
@@ -16,8 +16,8 @@ program
 
 program.parse(process.argv);
 
-const environment = program.environment || "default";
-const configFile = program.config || "super-cp.yml";
+const environment = program.getOptionValue("environment") || "default";
+const configFile = program.getOptionValue("config") || "super-cp.yml";
 
 let configFileContent = "";
 
@@ -28,7 +28,7 @@ try {
   process.exit(1);
 }
 
-const config = yaml.safeLoad(configFileContent);
+const config = yaml.load(configFileContent) as any;
 
 const transferOptionsList: TransferConfig[] | undefined =
   config.environments[environment];
@@ -43,7 +43,7 @@ const transfers = transferOptionsList.map((i) => new Transfer(i));
 async function run(): Promise<void> {
   try {
     for (const transfer of transfers) {
-      await transfer.send({ dryRun: !!program.dryRun });
+      await transfer.send({ dryRun: !!program.getOptionValue("dry-run") });
     }
   } catch (e) {
     console.error(e);
