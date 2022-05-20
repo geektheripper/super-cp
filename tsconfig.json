@@ -1,17 +1,13 @@
 {
+  "extends": "@sindresorhus/tsconfig",
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "lib": ["es6", "es2015"],
-    "declaration": false,
-    "experimentalDecorators": true,
-    "outDir": "lib",
-    "rootDir": "src",
-    "strict": true,
-    "types": ["node"],
+    "outDir": "dist",
+    "target": "es2020",
+    "lib": ["es2020"],
+    "noPropertyAccessFromIndexSignature": false,
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "importHelpers": true
+    "removeComments": true,
+    "noUnusedLocals": false
   },
-  "exclude": ["node_modules", "lib", "templates"]
+  "include": ["src"]
 }

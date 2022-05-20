@@ -1,11 +1,11 @@
-import merge from "lodash/merge";
+import merge from "lodash/merge.js";
 
 export type PartternOptions<T> =
   | string
   | {
-      glob: string;
-      options?: T;
-    };
+    glob: string;
+    options?: T;
+  };
 
 export default class Parttern<T> {
   glob: string;

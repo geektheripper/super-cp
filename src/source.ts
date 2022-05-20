@@ -1,7 +1,10 @@
-import glob from "glob";
 import escapeStr from "escape-string-regexp";
-import File from "./file";
-import Parttern, { PartternOptions } from "./pattern";
+import glob from "glob";
+import { promisify } from "util";
+const pGlob = promisify(glob)
+
+import File from "./file.js";
+import Parttern, { PartternOptions } from "./pattern.js";
 
 export interface SourceOptions {
   pattern: PartternOptions<glob.IOptions>;
@@ -19,16 +22,10 @@ export default class Source {
     this.strip = strip || "";
     this.stripRegex = new RegExp("^" + escapeStr(this.strip));
   }
-  listFiles(): Promise<File[]> {
-    return new Promise((resolve, reject) => {
-      glob(this.pattern.glob, this.pattern.options, (err, matchs) => {
-        if (err) return reject(err);
-        resolve(
-          matchs.map(
-            (path) => new File({ path, key: path.replace(this.stripRegex, "") })
-          )
-        );
-      });
-    });
+  async listFiles(): Promise<File[]> {
+    const matchs = await pGlob(this.pattern.glob, this.pattern.options);
+    return matchs.map(
+      (path) => new File({ path, key: path.replace(this.stripRegex, "") })
+    )
   }
 }

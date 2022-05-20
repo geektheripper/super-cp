@@ -1,20 +1,24 @@
 import path from "path";
-import AliOss, { ACLType, Options as AliOssOptions } from "ali-oss";
-import merge from "lodash/merge";
-import mime from "mime";
-import caculateFileMd5 from "./content-md5";
-import objectHash from "object-hash";
-import assignEnvironment from "../../utils/assign-environment";
-import { DistProto, DistSendOptions } from "../dist-types";
 
-interface OssOption extends AliOss.Options {
+import AliOss from "ali-oss";
+import merge from "lodash/merge.js";
+import mime from "mime";
+import objectHash from "object-hash";
+
+import assignEnvironment from "../../utils/assign-environment.js";
+import { DistProto, DistSendOptions } from "../dist-types.js";
+
+import caculateFileMd5 from "./content-md5.js";
+
+export interface OssOption
+  extends Omit<AliOss.Options, "accessKeyId" | "accessKeySecret"> {
   path?: string;
 }
 
 interface OssSendOptions {
   headers?: Record<string, string>;
   autoMimeType?: boolean;
-  acl?: ACLType;
+  acl?: AliOss.ACLType;
 }
 
 enum HeaderKeys {
@@ -28,21 +32,21 @@ enum HeaderKeys {
 export default class Oss implements DistProto {
   path: string;
   private client: AliOss;
-  private bucketAcl: ACLType | null = null;
-  private ossOptions: AliOssOptions;
+  private bucketAcl: AliOss.ACLType | null = null;
+  private ossOptions: AliOss.Options;
   constructor({ path, ...aliOssOptions }: OssOption) {
     this.path = path || "/";
 
-    this.ossOptions = assignEnvironment(aliOssOptions) as AliOssOptions;
+    this.ossOptions = assignEnvironment(aliOssOptions) as AliOss.Options;
     this.client = new AliOss(this.ossOptions);
   }
-  async getBucketAcl(): Promise<ACLType> {
+  async getBucketAcl(): Promise<AliOss.ACLType> {
     if (!this.bucketAcl) {
       const result = await this.client.getBucketACL(
         this.ossOptions.bucket as string,
         {}
       );
-      this.bucketAcl = result.acl as ACLType;
+      this.bucketAcl = result.acl as AliOss.ACLType;
     }
     return this.bucketAcl;
   }
@@ -85,7 +89,9 @@ ${Object.keys(headers)
     try {
       const head = await this.client.head(key);
       remoteHeaders = head.res.headers as Record<string, string>;
-    } catch { }
+    } catch {
+      //
+    }
 
     // object content changed
     // can't reset header for object via aliyun oss api

@@ -1,5 +1,5 @@
-import File from "../file";
-import Rule from "../rule";
+import File from "../file.js";
+import Rule from "../rule.js";
 
 export interface DistSendOptions {
   file: File;

@@ -1,10 +1,13 @@
 #!/usr/bin/env node
-import { program } from "commander";
 import fs from "fs";
-import yaml from "js-yaml";
-import Transfer, { TransferConfig } from "./transfer";
 
-program.version(require("../package.json").version).description("Super CP!");
+import { program } from "commander";
+import yaml from "js-yaml";
+
+import Transfer, { TransferConfig } from "./transfer.js";
+import { getVersion } from "./utils/get-version.js";
+
+program.version(getVersion()).description("Super CP!");
 
 program
   .option("-e --environment <string>", "specify environment you use")
@@ -43,7 +46,7 @@ const transfers = transferOptionsList.map((i) => new Transfer(i));
 async function run(): Promise<void> {
   try {
     for (const transfer of transfers) {
-      await transfer.send({ dryRun: !!program.getOptionValue("dry-run") });
+      await transfer.send({ dryRun: !!program.getOptionValue("dryRun") });
     }
   } catch (e) {
     console.error(e);

@@ -1,18 +1,20 @@
-import { DistProto } from "./dist-types";
+import { DistProto } from "./dist-types.js";
 export { DistProto };
 
 type DistType = string;
 
 export interface DistOptions {
   type: DistType;
-  [key: string]: string;
+  [key: string]: any;
 }
 
-export default function distBuilder(opts: DistOptions): DistProto {
+export default async function distBuilder(
+  opts: DistOptions
+): Promise<DistProto> {
   if (opts.type === "@oss") {
-    const Oss = require("./oss").default;
-    return new Oss(opts);
+    const Oss = (await import("./oss/index.js")).default;
+    return new Oss(opts as any);
   }
-  const Dist = require(opts.type).default;
+  const Dist = (await import(opts.type)).default;
   return new Dist(opts);
 }

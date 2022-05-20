@@ -1,6 +1,6 @@
-import Source, { SourceOptions } from "./source";
-import Rule, { RuleOptions } from "./rule";
-import distBuilder, { DistOptions, DistProto } from "./dists";
+import distBuilder, { DistOptions, DistProto } from "./dists/index.js";
+import Rule, { RuleOptions } from "./rule.js";
+import Source, { SourceOptions } from "./source.js";
 
 export interface TransferConfig {
   source: SourceOptions;
@@ -15,7 +15,7 @@ export interface TransferSendOptions {
 
 export default class Transfer {
   source: Source;
-  dist: DistProto;
+  dist: Promise<DistProto>;
   rules: Rule[];
 
   constructor(opts: TransferConfig) {
@@ -29,19 +29,20 @@ export default class Transfer {
     const dryRun = opts?.dryRun || false;
 
     const files = await this.source.listFiles();
+    const dist = await this.dist;
 
     const sendFile = async (
-      resolve: () => void,
+      resolve: (v?: unknown) => void,
       reject: (e: Error) => void
     ): Promise<void> => {
       try {
         const file = files.pop();
         if (!file) return resolve();
         const rules = this.rules.filter((r) => r.test(file.key));
-        await this.dist.send({ file, rules, dryRun });
+        await dist.send({ file, rules, dryRun });
         sendFile(resolve, reject);
       } catch (e) {
-        reject(e);
+        reject(e as Error);
       }
     };
 
