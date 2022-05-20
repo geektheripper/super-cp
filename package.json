@@ -1,6 +1,6 @@
 {
   "name": "super-cp",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "copy files to any storage.",
   "type": "module",
   "main": "./lib/index.js",
